@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Flashcards-AWS</title>
+
+        <meta name="description" content="Cloudbite is a low-barrier, free web app that helps you learn AWS skills with flashcards and spaced repetition." />
+        <meta name="viewport" content="width=700, initial-scale=0.5" />
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+
+    <body>
+        <div id="centered-content">
+            <!-- Navigation bar -->
+            <div id="navigation-bar" class="unselectable"> 
+                <!-- Warning to prevent issue where people might accidentally bookmark a specific card URL -->
+                <div class="navigation-item" id="warning-direct-link" style="visibility: visible"></div>
+            </div>
+
+            <!-- Action bar -->
+            <div id="action-bar" class="unselectable">
+                <div class="action-bar-item" id="abi-later" onClick="repeatLater()" alt="I got this (repeat later)">
+                    <svg
+                        class="svg-container"
+                        id="abi-later-svg-container"
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="#b7b7a4"
+                    >
+                        <path
+                            id="abi-later-svg-container-path"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                    </svg>
+                    <span class="svg-caption">Eu acertei<br />(repetir depois)</span>
+                </div>
+                
+                <div class="action-bar-item" id="abi-soon" onClick="repeatSoon()" alt="I need practice (repeat soon)">
+                    <svg
+                        class="svg-container"
+                        id="abi-soon-svg-container"
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="#b7b7a4"
+                    >
+                        <path
+                            id="abi-soon-svg-container-path"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                    </svg>
+                    <span class="svg-caption">Eu preciso praticar<br />(repita em breve)</span>
+                </div>
+                <div class="action-bar-item" id="abi-never" onClick="repeatNever()" alt="Forget this (repeat never)">
+                    <svg
+                        class="svg-container"
+                        id="abi-never-svg-container"
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="#b7b7a4"
+                    >
+                        <path
+                            id="abi-never-svg-container-path"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                    </svg>
+                    <span class="svg-caption">Pode deletar<br />(não repita mais)</span>
+                </div>
+            </div>
+
+            <!-- Potemkin card -->
+            <div id="potemkin-card">
+                <div id="potemkin-card-inner-container">
+                    <div id="potemkin-card-front-container">
+                        <!-- <img src="assets/logo_aws.svg" class="cloud-provider-on-card unselectable" alt="" /> retirei a logo-->
+                        <div id="potemkin-card-front"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real card -->
+            <div id="flip-card-outer-container">
+                <div id="card-left" class="unselectable" onMouseOver="hover(-10)" onMouseOut="hover(0)"></div>
+                <div id="card-right" class="unselectable" onMouseOver="hover(10)" onMouseOut="hover(0)"></div>
+                <div id="flip-card-inner-container">
+                    <div id="flip-card-front-container">
+                       <!-- <img src="assets/logo_aws.svg" class="cloud-provider-on-card unselectable" alt="" /> retirei a logo-->
+                        <div id="flip-card-front"></div>
+                    </div>
+                    <div id="flip-card-back-container">
+                        <div id="flip-card-back"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User data card -->
+            <div id="user-data-card">
+                <div id="user-data-card-close-button" onClick="onToggleUserCard()">
+                    <svg class="svg-container" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="#b7b7a4">
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                    </svg>
+                </div>
+                <div id="user-data-card-text"></div>
+            </div>
+            
+            <!-- Deck filter -->
+            <div id="deck-filter" style="visibility: hidden">
+                <input type="text" id="deck-filter-input" placeholder="Custom filter (e.g. 'RDS')" />
+                <div id="deck-filter-clear-button" style="visibility: hidden" onClick="deckFilterClear()" title="Clear filter" alt="Clear filter">
+                    <svg class="svg-container" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="#b7b7a4">
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                    </svg>
+                </div>
+            </div>            
+        </div>
+       <p id="add-card-input">
+        
+
+        <script src="name-generator.js" type="text/javascript" charset="UTF-8"></script>
+        <script src="content/aws.js" type="text/javascript" charset="UTF-8"></script>
+        <script src="app.js" type="text/javascript" charset="UTF-8"></script>
+        <script async defer data-domain="cloudbite.attejuvonen.fi" src="https://plausible.io/js/plausible.js"></script>
+    </body>
+</html>
