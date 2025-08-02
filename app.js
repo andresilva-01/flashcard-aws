@@ -1,8 +1,8 @@
 // Shove all cards from all decks into flipcards.
 flipcards = [];
 // AWS deck
-for (let i = 0; i < aws_cards.length; i++) {
-    const card = aws_cards[i];
+for (let i = 0; i < aws_card_modulo_sete.length; i++) {
+    const card = aws_card_modulo_sete[i];
     card.deck = "aws";
     flipcards.push(card);
 }
